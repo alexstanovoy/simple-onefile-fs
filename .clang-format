@@ -1,8 +1,9 @@
-BasedOnStyle: Google
+BasedOnStyle: LLVM
 ---
-Language: Cpp
+Language: C
+IndentWidth: 2
 AllowShortFunctionsOnASingleLine: false
 AllowShortIfStatementsOnASingleLine: false
 DerivePointerAlignment: false
-PointerAlignment: Left
 SortIncludes: true
+PointerAlignment: Left
