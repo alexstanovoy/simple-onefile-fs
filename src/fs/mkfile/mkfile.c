@@ -1,17 +1,13 @@
-#include <fs/find_inode/find_inode.h>
-#include <fs/headers.h>
-#include <fs/mkdir/mkdir.h>
-#include <fs/page_alloc/page_alloc.h>
-#include <fs/utility.h>
 #include <stddef.h>
 #include <string.h>
+#include <fs/utility.h>
+#include <fs/page_alloc/page_alloc.h>
+#include <fs/find_inode/find_inode.h>
+#include <fs/mkfile/mkfile.h>
 
-#include <stdio.h>
 
-
-directory_inode* mkdir(file_system* fs, directory_inode* dir, const char* name) {
+file_inode* mkfile(file_system* fs, directory_inode* dir, const char* name) {
   if (dir->entry_count == MAX_DIRECTORY_ENTRIES) {
-    puts("1");
     return NULL;
   }
   size_t index = 0;
@@ -22,17 +18,15 @@ directory_inode* mkdir(file_system* fs, directory_inode* dir, const char* name) 
     }
     dir->entries[index] = (inode_header*)page_alloc_file_system(fs);
     if (dir->entries[index] == NULL) {
-      puts("2");
       return NULL;
     }
     ++dir->entry_count;
     break;
   }
-  puts("last");
-  return init_directory_inode((directory_inode*)dir->entries[index], name);
+  return init_file_inode((file_inode*)dir->entries[index], name);
 }
 
-int mkdir_file_system(file_system* fs, const char* path) {
+int mkfile_file_system(file_system* fs, const char* path) {
   if (verify_path(path) < 0 || strcmp(path, "/") == 0 ||
       find_inode_file_system(fs, path) != NULL) {
     return -1;
@@ -43,10 +37,10 @@ int mkdir_file_system(file_system* fs, const char* path) {
   if (dir == NULL || dir->inode_info.type != Directory) {
     return -1;
   }
-  return mkdir(fs, dir, name) == NULL ? -1 : 0;
+  return mkfile(fs, dir, name) == NULL ? -1 : 0;
 }
 
-int rmdir(file_system* fs, directory_inode* dir, const char* name) {
+int rmfile(file_system* fs, directory_inode* dir, const char* name) {
   size_t index = 0;
   while (index < MAX_DIRECTORY_ENTRIES) {
     if (dir->entries[index] == NULL ||
@@ -54,11 +48,17 @@ int rmdir(file_system* fs, directory_inode* dir, const char* name) {
       ++index;
       continue;
     }
-    directory_inode* del_dir = (directory_inode*)dir->entries[index];
-    if (del_dir->inode_info.type != Directory || del_dir->entry_count > 0) {
+    file_inode* del_file = (file_inode*)dir->entries[index];
+    if (del_file->inode_info.type != File) {
       return -1;
     }
-    page_free_file_system(fs, (page_header*)del_dir);
+    continuation_inode* cur_header = (continuation_inode*)del_file->next_inode;
+    page_free_file_system(fs, (page_header*)del_file);
+    while (cur_header != NULL) {
+      continuation_inode* next_header = cur_header->next_inode;
+      page_free_file_system(fs, (page_header*)cur_header);
+      cur_header = next_header;
+    }
     dir->entries[index] = NULL;
     --dir->entry_count;
     return 0;
@@ -66,7 +66,7 @@ int rmdir(file_system* fs, directory_inode* dir, const char* name) {
   return -1;
 }
 
-int rmdir_file_system(file_system* fs, const char* path) {
+int rmfile_file_system(file_system* fs, const char* path) {
   if (verify_path(path) < 0 || strcmp(path, "/") == 0 ||
       find_inode_file_system(fs, path) == NULL) {
     return -1;
@@ -77,5 +77,5 @@ int rmdir_file_system(file_system* fs, const char* path) {
   if (dir == NULL || dir->inode_info.type != Directory) {
     return -1;
   }
-  return rmdir(fs, dir, name);
+  return rmfile(fs, dir, name);
 }

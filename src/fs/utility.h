@@ -2,10 +2,17 @@
 #define UTILITY_H
 
 #include <stdint.h>
+#include <fs/headers.h>
 
 
-size_t min(size_t a, size_t b);
+int verify_path(const char* path);
 
-size_t max(size_t a, size_t b);
+char* get_parents_only(const char* path);
+
+char* get_name_only(const char* path);
+
+uint32_t min(uint32_t a, uint32_t b);
+
+uint32_t max(uint32_t a, uint32_t b);
 
 #endif
