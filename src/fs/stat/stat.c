@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -19,10 +20,10 @@ int stat_file_system(file_system* fs, const char* path, struct stat* st) {
   *st = (struct stat){
     .st_dev = 0,
     .st_ino = inode_number_file_system(fs, inode),
-    .st_mode = S_IFREG | 0777,
+    .st_mode = 0777,
     .st_nlink = 1,
-    .st_uid = 0,
-    .st_gid = 0,
+    .st_uid = geteuid(),
+    .st_gid = getgid(),
     .st_rdev = 0,
     .st_blksize = 0,
     .st_blocks = 0,
@@ -32,6 +33,7 @@ int stat_file_system(file_system* fs, const char* path, struct stat* st) {
   };
   switch (inode->type) {
     case Directory:
+      st->st_mode |= S_IFDIR;
       ++st->st_nlink;
       directory_inode* dir = (directory_inode*)inode;
       for (size_t index = 0; index < MAX_DIRECTORY_ENTRIES; ++index) {
@@ -42,6 +44,7 @@ int stat_file_system(file_system* fs, const char* path, struct stat* st) {
       st->st_size = PAGE_SIZE;
       break;
     case File:
+      st->st_mode |= S_IFREG;
       st->st_size = ((file_inode*)inode)->size;
       break;
     default:

@@ -6,12 +6,9 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <stdio.h>
-
 
 directory_inode* mkdir(file_system* fs, directory_inode* dir, const char* name) {
   if (dir->entry_count == MAX_DIRECTORY_ENTRIES) {
-    puts("1");
     return NULL;
   }
   size_t index = 0;
@@ -22,13 +19,11 @@ directory_inode* mkdir(file_system* fs, directory_inode* dir, const char* name) 
     }
     dir->entries[index] = (inode_header*)page_alloc_file_system(fs);
     if (dir->entries[index] == NULL) {
-      puts("2");
       return NULL;
     }
     ++dir->entry_count;
     break;
   }
-  puts("last");
   return init_directory_inode((directory_inode*)dir->entries[index], name);
 }
 

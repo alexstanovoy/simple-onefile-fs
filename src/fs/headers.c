@@ -2,12 +2,11 @@
 #include <stdlib.h>
 #include <fs/headers.h>
 
-#include <stdio.h>
+
 directory_inode* init_directory_inode(directory_inode* dir, const char* name) {
   dir->inode_info.type = Directory;
   strcpy(dir->inode_info.name, name);
   dir->entry_count = 0;
-  puts(name);
   return dir;
 }
 

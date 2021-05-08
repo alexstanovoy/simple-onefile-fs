@@ -4,12 +4,14 @@
 #include <sys/mman.h>
 #include <string.h>
 #include <stddef.h>
-
 #include <fs/headers.h>
 #include <fs/open_fs/open_fs.h>
 
 
 file_system* open_file_system(char* file_name) {
+  if (file_name == NULL) {
+    return NULL;
+  }
   int fd = open(file_name, O_RDWR);
   if (fd < 0) {
     return NULL;

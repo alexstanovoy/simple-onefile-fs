@@ -6,18 +6,21 @@
 #include <fs/find_inode/find_inode.h>
 #include <fs/fs_utility/fs_utility.h>
 
-
-continuation_inode* reduce_off(file_system* fs, file_inode* file, uint32_t* off) {
+#include <stdio.h>
+continuation_inode* reduce_off(file_system* fs, file_inode* file,
+                               uint32_t* off, uint32_t* tail_size) {
   // if (fs == NULL)  ->  new pages are not created
-  // off after usage is from __page__ begin! 
+  // off after usage is from __page__ begin!
   if (*off < PAGE_SIZE - sizeof(file_inode)) {
     *off += sizeof(file_inode);
     return (continuation_inode*)file;
   }
   *off -= PAGE_SIZE - sizeof(file_inode);
+  *tail_size -= PAGE_SIZE - sizeof(file_inode);
   continuation_inode* cont = file->next_inode;
   while (*off >= PAGE_SIZE - sizeof(continuation_inode)) {
     *off -= PAGE_SIZE - sizeof(continuation_inode);
+    *tail_size -= PAGE_SIZE - sizeof(continuation_inode);
     if (cont->next_inode == NULL) {
       if (fs == NULL) {
         return NULL;
@@ -84,11 +87,12 @@ int read_file_system(file_system* fs, const char* path, void* buf,
     return -1;
   }
   uint32_t ready = 0;
-  uint32_t to_copy = min(count, PAGE_SIZE - off);
+  uint32_t to_copy = min(count, min(PAGE_SIZE - off);
   memcpy(buf, (void*)(cont + off), to_copy);
   count -= to_copy;
   buf += to_copy;
   ready += to_copy;
+  printf("%u %u\n", count, to_copy);
   while (count > 0) {
     if (cont->next_inode == NULL) {
       return ready;
