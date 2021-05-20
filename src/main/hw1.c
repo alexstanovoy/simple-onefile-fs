@@ -54,8 +54,6 @@ int my_readdir(const char* path, void* out, fuse_fill_dir_t filler, off_t off,
 }
 
 int my_stat(const char* path, struct stat *st, struct fuse_file_info* fi) {
-  puts("stat!");
-  puts(path);
   (void)fi;
   if (strcmp(path, "/") == 0) {
     st->st_mode = S_IFDIR | 0555;
