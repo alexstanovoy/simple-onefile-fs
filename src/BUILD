@@ -33,7 +33,7 @@ cc_library(
 )
 
 cc_binary(
-  name = 'hw1',
+  name = 'hw1-debug',
   srcs = [
     'main/hw1.c',
     '//src:fs',
@@ -45,6 +45,23 @@ cc_binary(
   copts = [
     '-O0',
     '-g'
+  ],
+  deps = ['//src:fs'],
+  linkopts = [
+    '-lfuse3',
+    '-lpthread',
+  ],
+)
+
+cc_binary(
+  name = 'hw1',
+  srcs = [
+    'main/hw1.c',
+    '//src:fs',
+  ],
+  defines = [
+    '_FILE_OFFSET_BITS=64',
+    'FUSE_USE_VERSION=30',
   ],
   deps = ['//src:fs'],
   linkopts = [

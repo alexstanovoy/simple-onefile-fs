@@ -54,6 +54,8 @@ int my_readdir(const char* path, void* out, fuse_fill_dir_t filler, off_t off,
 }
 
 int my_stat(const char* path, struct stat *st, struct fuse_file_info* fi) {
+  puts("stat!");
+  puts(path);
   (void)fi;
   if (strcmp(path, "/") == 0) {
     st->st_mode = S_IFDIR | 0555;
@@ -85,6 +87,17 @@ int my_read(const char* path, char* out, size_t size, off_t off,
   return read_file_system(fs, path, out, size, off);
 }
 
+int my_write(const char* path, const char* buf, size_t size, off_t off,
+             struct fuse_file_info* fi) {
+  puts("write!");
+  puts(path);
+  (void)fi;
+  if (is_file_file_system(fs, path) < 0) {
+    return -ENOENT;
+  }
+  return write_file_system(fs, path, buf, size, off);
+}
+
 int my_mkdir(const char* path, mode_t mode) {
   (void)mode;
   return mkdir_file_system(fs, path);
@@ -105,7 +118,7 @@ struct fuse_operations operations = {
   .getattr = my_stat,
   .open = my_open,
   .read = my_read,
-  //.write
+  .write = my_write,
   .mkdir = my_mkdir,
   .rmdir = my_rmdir,
   .create = my_create,

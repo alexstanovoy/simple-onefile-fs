@@ -2,7 +2,6 @@
 #define UTILITY_H
 
 #include <stdint.h>
-#include <fs/headers.h>
 
 
 int verify_path(const char* path);
