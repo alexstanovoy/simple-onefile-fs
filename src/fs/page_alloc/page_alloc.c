@@ -15,6 +15,6 @@ page_header* page_alloc_file_system(file_system* fs) {
 
 void page_free_file_system(file_system* fs, page_header* page) {
   uint32_t page_index = ((uint8_t*)page - (uint8_t*)fs->root_directory) / PAGE_SIZE;
-  fs->is_page_free[page_index] = 0;
+  fs->is_page_free[page_index] = 1;
   ++fs->free_pages_count;
 }

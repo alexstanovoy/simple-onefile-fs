@@ -13,6 +13,9 @@ cc_library(
     'fs/fs_utility/fs_utility.c',
     'fs/stat/stat.c',
     'fs/write/write.c',
+    'fs/utimesat/utimesat.c',
+    'fs/chown/chown.c',
+    'fs/chmod/chmod.c',
   ],
   hdrs = [
     'fs/find_inode/find_inode.h',
@@ -28,6 +31,9 @@ cc_library(
     'fs/fs_utility/fs_utility.h',
     'fs/stat/stat.h',
     'fs/write/write.h',
+    'fs/utimesat/utimesat.h',
+    'fs/chown/chown.h',
+    'fs/chmod/chmod.h',
   ],
   includes = ['.'],
 )

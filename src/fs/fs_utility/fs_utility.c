@@ -3,7 +3,7 @@
 
 
 uint32_t inode_number_file_system(file_system* fs, inode_header* inode) {
-  return ((uint8_t*)fs->root_directory - (uint8_t*)inode) / PAGE_SIZE;
+  return ((uint8_t*)inode - (uint8_t*)fs->root_directory) / PAGE_SIZE;
 }
 
 uint32_t pages_count_file_system(file_system* fs) {

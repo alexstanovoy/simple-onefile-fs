@@ -52,10 +52,10 @@ int rmfile(file_system* fs, directory_inode* dir, const char* name) {
     if (del_file->inode_info.type != File) {
       return -1;
     }
-    continuation_inode* cur_header = (continuation_inode*)del_file->next_inode;
+    continuation* cur_header = (continuation*)del_file->next;
     page_free_file_system(fs, (page_header*)del_file);
     while (cur_header != NULL) {
-      continuation_inode* next_header = cur_header->next_inode;
+      continuation* next_header = cur_header->next;
       page_free_file_system(fs, (page_header*)cur_header);
       cur_header = next_header;
     }

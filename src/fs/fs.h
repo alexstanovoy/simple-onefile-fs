@@ -9,5 +9,8 @@
 #include <fs/mkfile/mkfile.h>
 #include <fs/open_fs/open_fs.h>
 #include <fs/stat/stat.h>
+#include <fs/utimesat/utimesat.h>
+#include <fs/chown/chown.h>
+#include <fs/chmod/chmod.h>
 
 #endif

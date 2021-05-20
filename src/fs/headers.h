@@ -4,6 +4,7 @@
 #include <time.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <sys/types.h>
 
 #define PAGE_SIZE                ((uint32_t)4096)
 #define MAX_NAME_LENGTH          ((uint32_t)255)
@@ -11,6 +12,7 @@
 #define MINIMUM_FILESYSTEM_SIZE  (10 * PAGE_SIZE)
 #define PATH_DELIMITER           '/'
 #define PATH_DELIMITER_STR       "/"
+#define DEFAULT_MODE             0644
 
 
 typedef struct {} page_header;
@@ -24,9 +26,12 @@ typedef struct {
   page_header page_info;
   INodeType type;
   char name[MAX_NAME_LENGTH + 1];
-  //struct timespec st_atim;
-  //struct timespec st_mtim;
-  //struct timespec st_ctim;
+  uid_t uid;
+  gid_t gid;
+  mode_t mode;
+  struct timespec st_atim;
+  struct timespec st_mtim;
+  struct timespec st_ctim;
 } inode_header;
 
 typedef struct {
@@ -35,15 +40,15 @@ typedef struct {
   inode_header* entries[];
 } directory_inode;
 
-typedef struct __continuation_inode {
+typedef struct __continuation {
   page_header page_info;
-  struct __continuation_inode* next_inode;
+  struct __continuation* next;
   int8_t content[];
-} continuation_inode;
+} continuation;
 
 typedef struct {
   inode_header inode_info;
-  continuation_inode* next_inode;
+  continuation* next;
   uint64_t size;
   uint8_t content[];
 } file_inode;

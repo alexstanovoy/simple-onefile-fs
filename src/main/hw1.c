@@ -15,7 +15,7 @@ typedef struct {
 
 my_options_t my_options;
 
-file_system* fs;
+file_system* fs = NULL;
 
 void* my_init(struct fuse_conn_info* conn, struct fuse_config* cf) {
   (void)conn;
@@ -25,6 +25,9 @@ void* my_init(struct fuse_conn_info* conn, struct fuse_config* cf) {
   } else if (strcmp(my_options.cmd, "init") == 0) {
     fs = init_file_system(my_options.file_name);
   } else {
+    exit(1);
+  }
+  if (fs == NULL) {
     exit(1);
   }
   return NULL;
@@ -55,11 +58,6 @@ int my_readdir(const char* path, void* out, fuse_fill_dir_t filler, off_t off,
 
 int my_stat(const char* path, struct stat *st, struct fuse_file_info* fi) {
   (void)fi;
-  if (strcmp(path, "/") == 0) {
-    st->st_mode = S_IFDIR | 0555;
-    st->st_nlink = 2;
-    return 0;
-  }
   if (stat_file_system(fs, path, st) < 0) {
     return -ENOENT;
   }
@@ -79,18 +77,12 @@ int my_open(const char* path, struct fuse_file_info* fi) {
 int my_read(const char* path, char* out, size_t size, off_t off,
             struct fuse_file_info* fi) {
   (void)fi;
-  if (is_file_file_system(fs, path) < 0) {
-    return -ENOENT;
-  }
   return read_file_system(fs, path, out, size, off);
 }
 
 int my_write(const char* path, const char* buf, size_t size, off_t off,
              struct fuse_file_info* fi) {
   (void)fi;
-  if (is_file_file_system(fs, path) < 0) {
-    return -ENOENT;
-  }
   return write_file_system(fs, path, buf, size, off);
 }
 
@@ -109,6 +101,26 @@ int my_create(const char* path, mode_t mode, struct fuse_file_info* fi) {
   return mkfile_file_system(fs, path);
 }
 
+int my_utimens(const char* path, const struct timespec times[2],
+               struct fuse_file_info *fi) {
+  (void)fi;
+  return utimensat_file_system(fs, path, times);
+}
+
+int my_unlink(const char* path) {
+  return rmfile_file_system(fs, path);
+}
+
+int my_chown(const char* path, uid_t uid, gid_t gid, struct fuse_file_info* fi) {
+  (void)fi;
+  return chown_file_system(fs, path, uid, gid);
+}
+
+int my_chmod(const char* path, mode_t mode, struct fuse_file_info* fi) {
+  (void)fi;
+  return chmod_file_system(fs, path, mode);
+}
+
 struct fuse_operations operations = {
   .readdir = my_readdir,
   .getattr = my_stat,
@@ -120,6 +132,10 @@ struct fuse_operations operations = {
   .create = my_create,
   .destroy = my_destroy,
   .init = my_init,
+  .utimens = my_utimens,
+  .unlink = my_unlink,
+  .chown = my_chown,
+  .chmod = my_chmod,
 };
 
 int main(int argc, char** argv) {
