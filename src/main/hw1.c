@@ -89,8 +89,6 @@ int my_read(const char* path, char* out, size_t size, off_t off,
 
 int my_write(const char* path, const char* buf, size_t size, off_t off,
              struct fuse_file_info* fi) {
-  puts("write!");
-  puts(path);
   (void)fi;
   if (is_file_file_system(fs, path) < 0) {
     return -ENOENT;

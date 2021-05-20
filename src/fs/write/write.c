@@ -8,7 +8,7 @@
 #include <fs/find_inode/find_inode.h>
 #include <fs/fs_utility/fs_utility.h>
 
-#include <stdio.h>
+
 ssize_t write_file_system(file_system* fs, const char* path, const void* buf,
                           size_t count, size_t off) {
   if (count == 0) {
